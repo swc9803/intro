@@ -1,0 +1,32 @@
+{
+  "name": "three-note",
+  "version": "0.0.0",
+  "private": true,
+  "scripts": {
+    "dev": "vite --host 0.0.0.0 --port 4000",
+    "build": "vite build",
+    "preview": "vite preview",
+    "lint": "eslint . --ext .vue,.js,.jsx,.cjs,.mjs --fix --ignore-path .gitignore",
+    "format": "prettier --write src/"
+  },
+  "dependencies": {
+    "ammo.js": "^0.0.10",
+    "firebase": "^9.18.0",
+    "gsap": "^3.11.4",
+    "three": "^0.150.1",
+    "vue": "^3.2.47",
+    "vue-router": "^4.1.6"
+  },
+  "devDependencies": {
+    "@rushstack/eslint-patch": "^1.2.0",
+    "@vitejs/plugin-vue": "^4.0.0",
+    "@vue/eslint-config-prettier": "^7.1.0",
+    "eslint": "^8.34.0",
+    "eslint-plugin-vue": "^9.9.0",
+    "firebase-tools": "^11.25.1",
+    "prettier": "^2.8.4",
+    "sass": "^1.59.2",
+    "unplugin-auto-import": "^0.15.1",
+    "vite": "^4.1.4"
+  }
+}
