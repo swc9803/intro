@@ -1,7 +1,6 @@
 <template>
 	<transition name="init">
 		<div v-show="loading" class="loadingContainer">
-			<div ref="loadingRef" />
 			<p>Loading, please wait a moment</p>
 		</div>
 	</transition>
@@ -94,11 +93,6 @@ import gsap from 'gsap';
 
 const containerRef = ref();
 const loading = ref(true);
-const loadingRef = ref();
-let loadingValue = 0;
-let progress1 = 0,
-	progress2 = 0,
-	progress3 = 0;
 
 const emailRef = ref();
 const svgRef = ref();
@@ -409,51 +403,45 @@ fontLoader.load(
 				coins[i].rotationZ,
 			);
 		}
+		loading.value = false;
 	},
 );
 
 // section3 model
 let diamond;
-loadingGLTF.load(
-	'/diamond.glb',
-	model => {
-		let diamondSize;
-		matchMedia('(max-width: 480px)').matches
-			? (diamondSize = 1.25)
-			: (diamondSize = 2.5);
-		diamond = model.scene;
-		diamond.scale.set(0, 0, 0);
-		diamond.rotation.set(0.25, 0, 0);
-		diamond.traverse(object => {
-			if (object instanceof THREE.Mesh) {
-				object.material.transparent = true;
-				object.material.opacity = 0.8;
-				object.material.metalness = 0.2;
-				object.material.roughness = 0.2;
-				const material = object.material;
-				if (material instanceof THREE.MeshStandardMaterial) {
-					material.toneMapped = false;
-				}
+loadingGLTF.load('/diamond.glb', model => {
+	let diamondSize;
+	matchMedia('(max-width: 480px)').matches
+		? (diamondSize = 1.25)
+		: (diamondSize = 2.5);
+	diamond = model.scene;
+	diamond.scale.set(0, 0, 0);
+	diamond.rotation.set(0.25, 0, 0);
+	diamond.traverse(object => {
+		if (object instanceof THREE.Mesh) {
+			object.material.transparent = true;
+			object.material.opacity = 0.8;
+			object.material.metalness = 0.2;
+			object.material.roughness = 0.2;
+			const material = object.material;
+			if (material instanceof THREE.MeshStandardMaterial) {
+				material.toneMapped = false;
 			}
-		});
-		scene.add(diamond);
+		}
+	});
+	scene.add(diamond);
 
-		sectionAni2.to(cylinders.scale, {
-			x: 0,
-			y: 0,
-			z: 0,
-		});
-		sectionAni2.to(diamond.scale, {
-			x: diamondSize,
-			y: diamondSize,
-			z: diamondSize,
-		});
-	},
-	xhr => {
-		progress3 = (xhr.loaded / xhr.total) * 100;
-		updateProgress();
-	},
-);
+	sectionAni2.to(cylinders.scale, {
+		x: 0,
+		y: 0,
+		z: 0,
+	});
+	sectionAni2.to(diamond.scale, {
+		x: diamondSize,
+		y: diamondSize,
+		z: diamondSize,
+	});
+});
 
 // section4
 let circleSize = 2.5;
@@ -508,8 +496,6 @@ for (let i = 0; i < 4; i++) {
 
 let ringModel;
 const setupModel = () => {
-	loading.value = false;
-
 	cylinders.children.forEach(cylinder => {
 		const cylinderTween1 = gsap.to(cylinder.scale, {
 			x: 1,
@@ -559,113 +545,99 @@ const setupModel = () => {
 		toneMapped: false,
 	});
 
-	loadingGLTF.load(
-		'/ring.glb',
-		gltf => {
-			ringModel = gltf.scene;
+	loadingGLTF.load('/ring.glb', gltf => {
+		ringModel = gltf.scene;
 
-			let ringSize = 1.2;
-			let ringPosition = { x: 4, y: 3 };
-			let diamondPosition = { x: -3, y: -1.5 };
-			if (matchMedia('(max-width: 480px)').matches) {
-				ringSize = 0.6;
-				ringPosition.x = 2;
-				ringPosition.y = 2;
-				diamondPosition.x = -1.5;
-				diamondPosition.y = -1.5;
-			}
+		let ringSize = 1.2;
+		let ringPosition = { x: 4, y: 3 };
+		let diamondPosition = { x: -3, y: -1.5 };
+		if (matchMedia('(max-width: 480px)').matches) {
+			ringSize = 0.6;
+			ringPosition.x = 2;
+			ringPosition.y = 2;
+			diamondPosition.x = -1.5;
+			diamondPosition.y = -1.5;
+		}
 
-			ringModel.scale.set(0, 0, 0);
-			ringModel.traverse(object => {
-				if (object instanceof THREE.Mesh) {
-					if (object.name.startsWith('GEM')) {
-						object.material = gemMaterial;
-						object.material.transparent = true;
-						object.material.opacity = 0.8;
-						object.material.metalness = 0.2;
-						object.material.roughness = 0.2;
-					} else {
-						object.material = goldMaterial;
-					}
+		ringModel.scale.set(0, 0, 0);
+		ringModel.traverse(object => {
+			if (object instanceof THREE.Mesh) {
+				if (object.name.startsWith('GEM')) {
+					object.material = gemMaterial;
+					object.material.transparent = true;
+					object.material.opacity = 0.8;
+					object.material.metalness = 0.2;
+					object.material.roughness = 0.2;
+				} else {
+					object.material = goldMaterial;
 				}
-			});
-			ringModel.rotation.set(6, 2.6, 2);
-			scene.add(ringModel);
+			}
+		});
+		ringModel.rotation.set(6, 2.6, 2);
+		scene.add(ringModel);
 
-			sectionAni3.to(ringModel.scale, {
-				x: ringSize,
-				y: ringSize,
-				z: ringSize,
-			});
-			sectionAni3.to(
-				ringModel.position,
-				{
-					x: ringPosition.x,
-					y: ringPosition.y,
-				},
-				'<',
-			);
-			sectionAni3.to(
-				diamond.position,
-				{
-					x: diamondPosition.x,
-					y: diamondPosition.y,
-				},
-				'<',
-			);
-			sectionAni3.to(
-				circles.scale,
-				{
-					x: 1,
-					y: 1,
-					z: 1,
-				},
-				'<',
-			);
-			const targetColor = new THREE.Color(0x15272d);
-			sectionAni3.to(
-				scene.background,
-				{
-					r: targetColor.r,
-					g: targetColor.g,
-					b: targetColor.b,
-				},
-				'<',
-			);
-			initCubes.forEach(tween => {
-				tween.play();
-				gsap.delayedCall(8 * 0.3 + 1, () => {
-					isAnimated = false;
-					textRef.value = 'text1';
-					svgRef.value.style.opacity = 1;
-					gsap.to(arrowRef.value, {
-						yPercent: 30,
-						duration: 0.7,
-						ease: 'none',
-						yoyo: true,
-						repeat: -1,
-					});
+		sectionAni3.to(ringModel.scale, {
+			x: ringSize,
+			y: ringSize,
+			z: ringSize,
+		});
+		sectionAni3.to(
+			ringModel.position,
+			{
+				x: ringPosition.x,
+				y: ringPosition.y,
+			},
+			'<',
+		);
+		sectionAni3.to(
+			diamond.position,
+			{
+				x: diamondPosition.x,
+				y: diamondPosition.y,
+			},
+			'<',
+		);
+		sectionAni3.to(
+			circles.scale,
+			{
+				x: 1,
+				y: 1,
+				z: 1,
+			},
+			'<',
+		);
+		const targetColor = new THREE.Color(0x15272d);
+		sectionAni3.to(
+			scene.background,
+			{
+				r: targetColor.r,
+				g: targetColor.g,
+				b: targetColor.b,
+			},
+			'<',
+		);
+		initCubes.forEach(tween => {
+			tween.play();
+			gsap.delayedCall(8 * 0.3 + 1, () => {
+				isAnimated = false;
+				textRef.value = 'text1';
+				svgRef.value.style.opacity = 1;
+				gsap.to(arrowRef.value, {
+					yPercent: 30,
+					duration: 0.7,
+					ease: 'none',
+					yoyo: true,
+					repeat: -1,
 				});
 			});
-			loading.value = false;
-			setTimeout(() => {
-				interval1 = setInterval(() => {
-					state.index++;
-				}, 50);
-			}, 4300);
-		},
-		xhr => {
-			progress2 = (xhr.loaded / xhr.total) * 100;
-			updateProgress();
-		},
-	);
-};
-function updateProgress() {
-	loadingValue = (progress1 + progress2 + progress3) / 3;
-	gsap.to(loadingRef.value, {
-		width: `${loadingValue}%`,
+		});
+		setTimeout(() => {
+			interval1 = setInterval(() => {
+				state.index++;
+			}, 50);
+		}, 4300);
 	});
-}
+};
 
 function init() {
 	renderer.setPixelRatio(window.devicePixelRatio);
@@ -1219,7 +1191,9 @@ onMounted(() => {
 		);
 		camera.position.set(0, 0, 10);
 
-		setupModel();
+		setTimeout(() => {
+			setupModel();
+		}, 2000);
 
 		init();
 		animate();
@@ -1245,15 +1219,7 @@ onMounted(() => {
 	height: calc(var(--vh) * 100);
 	overflow: hidden;
 	z-index: 1;
-	div {
-		position: absolute;
-		top: 50%;
-		left: 50%;
-		transform: translate(-50%, -50%);
-		width: 0;
-		height: 101%;
-		background: #7bd9f6;
-	}
+	background: #7bd9f6;
 	p {
 		position: absolute;
 		top: 50%;
